@@ -20,8 +20,6 @@ interface EmbedOptions {
   forceIframe?: boolean
 }
 
-export const pdfObjectVersion = '2.2.7'
-
 export function embed (
   url: string,
   targetSelector: HTMLElement | string,
@@ -88,7 +86,7 @@ export function embed (
     const embedType =
       forceIframe || supportRedirect || isSafariDesktop() ? 'iframe' : 'embed'
 
-    return generatePDFObjectMarkup(
+    return generatePDFoMarkup(
       embedType,
       targetNode,
       targetSelector,
@@ -114,7 +112,7 @@ export function embed (
   return embedError('This browser does not support embedded PDFs')
 }
 
-function generatePDFObjectMarkup (
+function generatePDFoMarkup (
   embedType: string,
   targetNode: HTMLElement,
   targetSelector: HTMLElement | string,
@@ -140,7 +138,7 @@ function generatePDFObjectMarkup (
   }
 
   embed.src = url + pdfOpenFragment
-  embed.className = 'pdfobject'
+  embed.className = 'pdfo'
   embed.title = title
   embed.id = id
 
@@ -157,7 +155,7 @@ function generatePDFObjectMarkup (
     embed.style.cssText = style
   }
 
-  targetNode.classList.add('pdfobject-container')
+  targetNode.classList.add('pdfo-container')
 
   // This is where the magic finally happens
   targetNode.appendChild(embed)
@@ -185,7 +183,7 @@ function getTargetElement (targetSelector: HTMLElement | string): HTMLElement {
 }
 
 function embedError (msg: string): void {
-  console.log('[PDFObject] ' + msg)
+  console.log('[pdfo] ' + msg)
 }
 
 function emptyNodeContents (node: HTMLElement): void {

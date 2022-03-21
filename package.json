@@ -4,7 +4,7 @@
   "description": "",
   "license": "MIT",
   "author": "Theo Beers",
-  "main": "pdfobject.ts",
+  "main": "pdfo.ts",
   "scripts": {
     "all": "npm run format && npm run lint && npm run check && npm run compile",
     "check": "tsc",
@@ -16,7 +16,6 @@
   "devDependencies": {
     "@types/node": "^17.0.21",
     "@typescript-eslint/eslint-plugin": "^5.15.0",
-    "@typescript-eslint/parser": "^5.15.0",
     "esbuild": "^0.14.27",
     "eslint": "^8.11.0",
     "prettier": "^2.5.1",

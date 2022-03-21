@@ -1,4 +1,4 @@
-import * as PDFObject from './pdfobject'
+import * as pdfo from './pdfo'
 
 const pdfOptions = {
   forceIframe: true,
@@ -7,4 +7,4 @@ const pdfOptions = {
   },
 }
 
-PDFObject.embed('dummy.pdf', '#pdf-box', pdfOptions)
+pdfo.embed('dummy.pdf', '#pdf-box', pdfOptions)
