@@ -6,6 +6,12 @@
  *  MIT-style license: https://pipwerks.mit-license.org/
  */
 
+declare global {
+  interface Navigator {
+    pdfViewerEnabled?: boolean
+  }
+}
+
 interface EmbedOptions {
   id?: string
   page?: number | string
@@ -219,6 +225,9 @@ function buildURLFragmentString (pdfParams: Record<string, unknown>): string {
 }
 
 export function supportsPDFs (): boolean {
+  // New property available in recent versions of Chrome and Firefox
+  const pdfViewerEnabled = navigator.pdfViewerEnabled === true
+
   /*
     There is a coincidental correlation between implementation of promises and 
     native PDF support in desktop browsers.
@@ -229,10 +238,11 @@ export function supportsPDFs (): boolean {
   const isModernBrowser = typeof Promise !== 'undefined'
 
   return (
-    !isMobileDevice() &&
-    // We're moving into the age of MIME-less browsers.
-    // They mostly all support PDF rendering without plugins.
-    isModernBrowser
+    pdfViewerEnabled ||
+    (!isMobileDevice() &&
+      // We're moving into the age of MIME-less browsers.
+      // They mostly all support PDF rendering without plugins.
+      isModernBrowser)
   )
 }
 
