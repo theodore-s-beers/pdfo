@@ -226,7 +226,12 @@ function buildURLFragmentString (pdfParams: Record<string, unknown>): string {
 
 export function supportsPDFs (): boolean {
   // New property available in recent versions of Chrome and Firefox
-  const pdfViewerEnabled = navigator.pdfViewerEnabled === true
+  const pdfViewerEnabled = navigator.pdfViewerEnabled
+
+  // If this comes back true or false, best to just go with it?
+  if (typeof pdfViewerEnabled === 'boolean') {
+    return pdfViewerEnabled
+  }
 
   /*
     There is a coincidental correlation between implementation of promises and 
@@ -237,13 +242,11 @@ export function supportsPDFs (): boolean {
   */
   const isModernBrowser = typeof Promise !== 'undefined'
 
-  return (
-    pdfViewerEnabled ||
-    (!isMobileDevice() &&
-      // We're moving into the age of MIME-less browsers.
-      // They mostly all support PDF rendering without plugins.
-      isModernBrowser)
-  )
+  // We're moving into the age of MIME-less browsers.
+  // They mostly all support PDF rendering without plugins.
+  const likelySupportsPDFs = !isMobileDevice() && isModernBrowser
+
+  return likelySupportsPDFs
 }
 
 function isMobileDevice (): boolean {
