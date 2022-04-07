@@ -6,6 +6,10 @@
  *  MIT-style license: https://pipwerks.mit-license.org/
  */
 
+//
+// TYPES
+//
+
 declare global {
   interface Navigator {
     pdfViewerEnabled?: boolean
@@ -24,6 +28,67 @@ interface EmbedOptions {
   supportRedirect?: boolean
   omitInlineStyles?: boolean
   forceIframe?: boolean
+}
+
+//
+// GLOBAL VARIABLES
+//
+
+// Shorthand variables for Navigator object and UA string
+const nav = window.navigator
+const ua = window.navigator.userAgent
+
+// A recent, and still Chromium-only, way of checking for a mobile browser
+const newMobileTest = nav.userAgentData?.mobile
+
+// Safari on iPadOS doesn't report as "mobile" when requesting a desktop site,
+// yet still fails to embed PDFs.
+const isSafariIOSDesktopMode =
+  nav.platform !== undefined &&
+  nav.platform === 'MacIntel' &&
+  nav.maxTouchPoints !== undefined &&
+  nav.maxTouchPoints > 1
+
+// Our best guess as to whether we're dealing with a mobile device
+const isMobileDevice =
+  newMobileTest === true ||
+  /Mobi|Tablet|Android|iPad|iPhone/.test(ua) ||
+  isSafariIOSDesktopMode
+
+// Safari desktop requires special handling (i.e., always use iframe)
+const isSafariDesktop =
+  !isMobileDevice &&
+  nav.vendor !== undefined &&
+  /Apple/.test(nav.vendor) &&
+  /Safari/.test(ua)
+
+//
+// FUNCTIONS
+//
+
+export function supportsPDFs (): boolean {
+  // New property available in recent versions of Chrome and Firefox
+  const pdfViewerEnabled = nav.pdfViewerEnabled
+
+  // If this comes back true or false, best to just go with it?
+  if (typeof pdfViewerEnabled === 'boolean') {
+    return pdfViewerEnabled
+  }
+
+  /*
+    There is a coincidental correlation between implementation of promises and 
+    native PDF support in desktop browsers.
+    We assume that if the browser supports promises it supports embedded PDFs.
+    Is this fragile? Sort of. But browser vendors removed mimetype detection, 
+    so we're left to improvise
+  */
+  const isModernBrowser = typeof Promise !== 'undefined'
+
+  // We're moving into the age of MIME-less browsers.
+  // They mostly all support PDF rendering without plugins.
+  const likelySupportsPDFs = !isMobileDevice && isModernBrowser
+
+  return likelySupportsPDFs
 }
 
 export function embed (
@@ -82,7 +147,7 @@ export function embed (
   // Embed PDF if traditional support is provided, or if this developer is
   // willing to roll with assumption that modern desktop (not mobile) browsers
   // natively support PDFs
-  if (supportsPDFs() || (assumptionMode && !isMobileDevice())) {
+  if (supportsPDFs() || (assumptionMode && !isMobileDevice)) {
     // Should we use <embed> or <iframe>? In most cases <embed>.
     // Allow developer to force <iframe>, if desired
     // There is an edge case where Safari does not respect 302 redirect requests
@@ -90,7 +155,7 @@ export function embed (
     // when using <iframe> instead of <embed> (Addresses issue #210). Forcing
     // Safari desktop to use iframe due to freezing bug in macOS 11 (Big Sur)
     const embedType =
-      forceIframe || supportRedirect || isSafariDesktop() ? 'iframe' : 'embed'
+      forceIframe || supportRedirect || isSafariDesktop ? 'iframe' : 'embed'
 
     return generatePDFoMarkup(
       embedType,
@@ -222,64 +287,4 @@ function buildURLFragmentString (pdfParams: Record<string, unknown>): string {
   }
 
   return string
-}
-
-export function supportsPDFs (): boolean {
-  // New property available in recent versions of Chrome and Firefox
-  const pdfViewerEnabled = navigator.pdfViewerEnabled
-
-  // If this comes back true or false, best to just go with it?
-  if (typeof pdfViewerEnabled === 'boolean') {
-    return pdfViewerEnabled
-  }
-
-  /*
-    There is a coincidental correlation between implementation of promises and 
-    native PDF support in desktop browsers.
-    We assume that if the browser supports promises it supports embedded PDFs.
-    Is this fragile? Sort of. But browser vendors removed mimetype detection, 
-    so we're left to improvise
-  */
-  const isModernBrowser = typeof Promise !== 'undefined'
-
-  // We're moving into the age of MIME-less browsers.
-  // They mostly all support PDF rendering without plugins.
-  const likelySupportsPDFs = !isMobileDevice() && isModernBrowser
-
-  return likelySupportsPDFs
-}
-
-function isMobileDevice (): boolean {
-  const nav = window.navigator
-  const ua = window.navigator.userAgent
-
-  // Safari on iPadOS doesn't report as 'mobile' when requesting desktop site,
-  // yet still fails to embed PDFs
-  const isSafariIOSDesktopMode =
-    nav.platform !== undefined &&
-    nav.platform === 'MacIntel' &&
-    nav.maxTouchPoints !== undefined &&
-    nav.maxTouchPoints > 1
-
-  // This is recent, and still Chromium-only
-  const newMobileTest = nav.userAgentData?.mobile
-
-  return (
-    isSafariIOSDesktopMode ||
-    /Mobi|Tablet|Android|iPad|iPhone/.test(ua) ||
-    newMobileTest === true
-  )
-}
-
-// Safari desktop requires special handling (i.e., always use iframe)
-function isSafariDesktop (): boolean {
-  const nav = window.navigator
-  const ua = window.navigator.userAgent
-
-  return (
-    !isMobileDevice() &&
-    nav.vendor !== undefined &&
-    /Apple/.test(nav.vendor) &&
-    /Safari/.test(ua)
-  )
 }
