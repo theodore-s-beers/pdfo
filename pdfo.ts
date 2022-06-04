@@ -10,12 +10,6 @@
 // TYPES
 //
 
-declare global {
-  interface Navigator {
-    pdfViewerEnabled?: boolean
-  }
-}
-
 interface EmbedOptions {
   id?: string
   page?: number | string
