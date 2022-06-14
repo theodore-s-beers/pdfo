@@ -1,3 +1,7 @@
+// This library was forked from Philip Hutchison's PDFObject. His license is
+// below. A substantial, and growing, number of changes has been made---not
+// least the conversion to TypeScript.
+
 /*!
  *  PDFObject v2.2.7
  *  https://github.com/pipwerks/PDFObject
