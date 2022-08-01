@@ -13,11 +13,11 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "@types/node": "^18.0.6",
-    "@typescript-eslint/eslint-plugin": "^5.30.7",
-    "@typescript-eslint/parser": "^5.30.7",
-    "esbuild": "^0.14.49",
-    "eslint": "^8.20.0",
+    "@types/node": "^18.6.3",
+    "@typescript-eslint/eslint-plugin": "^5.32.0",
+    "@typescript-eslint/parser": "^5.32.0",
+    "esbuild": "^0.14.51",
+    "eslint": "^8.21.0",
     "prettier": "^2.7.1",
     "typescript": "^4.7.4",
     "user-agent-data-types": "^0.3.0"
