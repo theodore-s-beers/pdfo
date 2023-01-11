@@ -61,33 +61,8 @@ const isSafariDesktop =
   /Safari/.test(ua)
 
 //
-// FUNCTIONS
+// PUBLIC FUNCTIONS
 //
-
-export function supportsPDFs (): boolean {
-  // New property available in recent versions of Chrome and Firefox
-  const pdfViewerEnabled = nav.pdfViewerEnabled
-
-  // If this comes back true or false, best to just go with it?
-  if (typeof pdfViewerEnabled === 'boolean') {
-    return pdfViewerEnabled
-  }
-
-  /*
-    There is a coincidental correlation between implementation of promises and 
-    native PDF support in desktop browsers.
-    We assume that if the browser supports promises it supports embedded PDFs.
-    Is this fragile? Sort of. But browser vendors removed mimetype detection, 
-    so we're left to improvise
-  */
-  const isModernBrowser = typeof Promise !== 'undefined'
-
-  // We're moving into the age of MIME-less browsers.
-  // They mostly all support PDF rendering without plugins.
-  const likelySupportsPDFs = !isMobileDevice && isModernBrowser
-
-  return likelySupportsPDFs
-}
 
 export function embed (
   url: string,
@@ -181,6 +156,69 @@ export function embed (
   return embedError('This browser does not support embedded PDFs')
 }
 
+export function supportsPDFs (): boolean {
+  // New property available in recent versions of Chrome and Firefox
+  const pdfViewerEnabled = nav.pdfViewerEnabled
+
+  // If this comes back true or false, best to just go with it?
+  if (typeof pdfViewerEnabled === 'boolean') {
+    return pdfViewerEnabled
+  }
+
+  /*
+    There is a coincidental correlation between implementation of promises and 
+    native PDF support in desktop browsers.
+    We assume that if the browser supports promises it supports embedded PDFs.
+    Is this fragile? Sort of. But browser vendors removed mimetype detection, 
+    so we're left to improvise
+  */
+  const isModernBrowser = typeof Promise !== 'undefined'
+
+  // We're moving into the age of MIME-less browsers.
+  // They mostly all support PDF rendering without plugins.
+  const likelySupportsPDFs = !isMobileDevice && isModernBrowser
+
+  return likelySupportsPDFs
+}
+
+//
+// PRIVATE FUNCTIONS (alphabetical)
+//
+
+function buildURLFragmentString (pdfParams: Record<string, unknown>): string {
+  let string = ''
+
+  if (pdfParams) {
+    for (const prop in pdfParams) {
+      if (Object.prototype.hasOwnProperty.call(pdfParams, prop)) {
+        string += `${encodeURIComponent(prop)}=${encodeURIComponent(
+          String(pdfParams[prop])
+        )}&`
+      }
+    }
+
+    // The string will be empty if no PDF Params found
+    if (string) {
+      string = `#${string}`
+
+      // Remove last ampersand
+      string = string.slice(0, string.length - 1)
+    }
+  }
+
+  return string
+}
+
+function embedError (msg: string): void {
+  console.log(`[pdfo] ${msg}`)
+}
+
+function emptyNodeContents (node: HTMLElement): void {
+  while (node.firstChild) {
+    node.removeChild(node.firstChild)
+  }
+}
+
 function generatePDFoMarkup (
   embedType: string,
   targetNode: HTMLElement,
@@ -249,38 +287,4 @@ function getTargetElement (targetSelector: HTMLElement | string): HTMLElement {
   }
 
   return targetNode
-}
-
-function embedError (msg: string): void {
-  console.log(`[pdfo] ${msg}`)
-}
-
-function emptyNodeContents (node: HTMLElement): void {
-  while (node.firstChild) {
-    node.removeChild(node.firstChild)
-  }
-}
-
-function buildURLFragmentString (pdfParams: Record<string, unknown>): string {
-  let string = ''
-
-  if (pdfParams) {
-    for (const prop in pdfParams) {
-      if (Object.prototype.hasOwnProperty.call(pdfParams, prop)) {
-        string += `${encodeURIComponent(prop)}=${encodeURIComponent(
-          String(pdfParams[prop])
-        )}&`
-      }
-    }
-
-    // The string will be empty if no PDF Params found
-    if (string) {
-      string = `#${string}`
-
-      // Remove last ampersand
-      string = string.slice(0, string.length - 1)
-    }
-  }
-
-  return string
 }
