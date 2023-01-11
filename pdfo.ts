@@ -215,7 +215,7 @@ function generatePDFoMarkup (
     let style = embedType === 'embed' ? 'overflow: auto;' : 'border: none;'
 
     if (targetSelector !== document.body) {
-      style += 'width: ' + width + '; height: ' + height + ';'
+      style += `width: ${width}; height: ${height};`
     } else {
       style +=
         'position: absolute; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%;'
@@ -252,7 +252,7 @@ function getTargetElement (targetSelector: HTMLElement | string): HTMLElement {
 }
 
 function embedError (msg: string): void {
-  console.log('[pdfo] ' + msg)
+  console.log(`[pdfo] ${msg}`)
 }
 
 function emptyNodeContents (node: HTMLElement): void {
@@ -267,17 +267,15 @@ function buildURLFragmentString (pdfParams: Record<string, unknown>): string {
   if (pdfParams) {
     for (const prop in pdfParams) {
       if (Object.prototype.hasOwnProperty.call(pdfParams, prop)) {
-        string +=
-          encodeURIComponent(prop) +
-          '=' +
-          encodeURIComponent(String(pdfParams[prop])) +
-          '&'
+        string += `${encodeURIComponent(prop)}=${encodeURIComponent(
+          String(pdfParams[prop])
+        )}&`
       }
     }
 
     // The string will be empty if no PDF Params found
     if (string) {
-      string = '#' + string
+      string = `#${string}`
 
       // Remove last ampersand
       string = string.slice(0, string.length - 1)
