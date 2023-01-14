@@ -257,10 +257,10 @@ function generatePDFoMarkup (
   let embed: HTMLEmbedElement | HTMLIFrameElement
 
   if (embedType === 'iframe' || embedType === 'fallback') {
-    embed = document.createElement(embedType) as HTMLIFrameElement
+    embed = document.createElement('iframe') as HTMLIFrameElement
     embed.allow = 'fullscreen'
   } else {
-    embed = document.createElement(embedType) as HTMLEmbedElement
+    embed = document.createElement('embed') as HTMLEmbedElement
     embed.type = 'application/pdf'
   }
 
