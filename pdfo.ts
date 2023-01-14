@@ -15,17 +15,18 @@
 //
 
 interface EmbedOptions {
+  assumptionMode?: boolean
+  fallbackLink?: string | boolean
+  fallbackPrefix?: string
+  forceIframe?: boolean
+  height?: string
   id?: string
+  omitInlineStyles?: boolean
   page?: number | string
   pdfOpenParams?: Record<string, unknown>
-  fallbackLink?: string | boolean
-  width?: string
-  height?: string
-  title?: string
-  assumptionMode?: boolean
   supportRedirect?: boolean
-  omitInlineStyles?: boolean
-  forceIframe?: boolean
+  title?: string
+  width?: string
 }
 
 //
@@ -76,11 +77,6 @@ export function embed (
   const id = typeof opt.id === 'string' ? opt.id : ''
   const page = opt.page || null
   const pdfOpenParams = opt.pdfOpenParams || {}
-  const fallbackLink =
-    typeof opt.fallbackLink === 'string' ||
-    typeof opt.fallbackLink === 'boolean'
-      ? opt.fallbackLink
-      : true
   const width = opt.width || '100%'
   const height = opt.height || '100%'
   const title = opt.title || 'Embedded PDF'
@@ -93,13 +89,16 @@ export function embed (
   const forceIframe =
     typeof opt.forceIframe === 'boolean' ? opt.forceIframe : false
 
+  // Fallback options require special handling
+  const fallbackPrefix = opt.fallbackPrefix || ''
+  const fallbackLink = fallbackPrefix
+    ? false
+    : typeof opt.fallbackLink === 'string' ||
+      typeof opt.fallbackLink === 'boolean'
+    ? opt.fallbackLink
+    : true
+
   const targetNode = getTargetElement(targetSelector)
-
-  const fallbackHTMLDefault =
-    "<p>This browser does not support inline PDFs. Please download the PDF to view it: <a href='[url]'>Download PDF</a></p>"
-
-  let fallbackHTML = ''
-  let pdfOpenFragment = ''
 
   // If target element is specified but not valid, exit without doing anything
   // How would targetNode be falsy? I don't yet understand this
@@ -113,7 +112,7 @@ export function embed (
   }
 
   // Stringify optional Adobe params for opening PDF (as fragment identifier)
-  pdfOpenFragment = buildURLFragmentString(pdfOpenParams)
+  const pdfOpenFragment = buildURLFragmentString(pdfOpenParams)
 
   // --== Attempt embed ==--
 
@@ -146,10 +145,31 @@ export function embed (
 
   // --== PDF embed not supported! Use fallback ==--
 
+  if (fallbackPrefix) {
+    const embedType = 'fallback'
+
+    return generatePDFoMarkup(
+      embedType,
+      targetNode,
+      targetSelector,
+      fallbackPrefix + url,
+      pdfOpenFragment,
+      width,
+      height,
+      id,
+      title,
+      omitInlineStyles
+    )
+  }
+
   // Display the fallback link if available
   if (fallbackLink) {
-    fallbackHTML =
+    const fallbackHTMLDefault =
+      "<p>This browser does not support inline PDFs. Please download the PDF to view it: <a href='[url]'>Download PDF</a></p>"
+
+    const fallbackHTML =
       typeof fallbackLink === 'string' ? fallbackLink : fallbackHTMLDefault
+
     targetNode.innerHTML = fallbackHTML.replace(/\[url\]/g, url)
   }
 
@@ -236,7 +256,7 @@ function generatePDFoMarkup (
 
   let embed: HTMLEmbedElement | HTMLIFrameElement
 
-  if (embedType === 'iframe') {
+  if (embedType === 'iframe' || embedType === 'fallback') {
     embed = document.createElement(embedType) as HTMLIFrameElement
     embed.allow = 'fullscreen'
   } else {
@@ -244,7 +264,7 @@ function generatePDFoMarkup (
     embed.type = 'application/pdf'
   }
 
-  embed.src = url + pdfOpenFragment
+  embed.src = embedType === 'fallback' ? url : url + pdfOpenFragment
   embed.className = 'pdfo'
   embed.title = title
   embed.id = id
