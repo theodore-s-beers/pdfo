@@ -18,7 +18,6 @@ interface EmbedOptions {
   assumeSupport?: boolean
   fallbackLink?: string
   fallbackPrefix?: string
-  forceIframe?: boolean
   height?: string
   omitInlineStyles?: boolean
   pdfOpenParams?: Record<string, unknown>
@@ -50,13 +49,6 @@ const isMobileDevice =
   /Mobi|Tablet|Android|iPad|iPhone/.test(ua) ||
   isSafariIOSDesktopMode
 
-// Safari desktop requires special handling (i.e., always use iframe)
-const isSafariDesktop =
-  !isMobileDevice &&
-  nav.vendor !== undefined &&
-  /Apple/.test(nav.vendor) &&
-  /Safari/.test(ua)
-
 //
 // PUBLIC FUNCTIONS
 //
@@ -77,8 +69,6 @@ export function embed (
     typeof opt.assumeSupport === 'boolean' ? opt.assumeSupport : true
   const omitInlineStyles =
     typeof opt.omitInlineStyles === 'boolean' ? opt.omitInlineStyles : false
-  const forceIframe =
-    typeof opt.forceIframe === 'boolean' ? opt.forceIframe : false
 
   // Fallback options require special handling
   const fallbackLink =
@@ -104,13 +94,16 @@ export function embed (
   // willing to roll with assumption that modern desktop (not mobile) browsers
   // natively support PDFs
   if (supportsPDFs() || (assumeSupport && !isMobileDevice)) {
-    // Should we use <embed> or <iframe>? In most cases <embed>.
-    // Allow developer to force <iframe>, if desired
-    // There is an edge case where Safari does not respect 302 redirect requests
-    // for PDF files when using <embed> element. Redirect appears to work fine
-    // when using <iframe> instead of <embed> (Addresses issue #210). Forcing
-    // Safari desktop to use iframe due to freezing bug in macOS 11 (Big Sur)
-    const embedType = forceIframe || isSafariDesktop ? 'iframe' : 'embed'
+    // Historically, the PDFObject library used <embed> elements by default,
+    // while providing the option of using <iframe> instead. Over time, it
+    // became increasingly common for browsers to have trouble with <embed>. I
+    // think we are on a trajectory to where <embed> will be effectively a
+    // deprecated element. <iframe> can do everything that <embed> can do, and
+    // it sees much, much more use. My choice for the pdfo fork of PDFObject,
+    // until further notice, is to use only <iframe>. This allows for some
+    // simplification of both the API and library logic. If there are indeed
+    // users who prefer <embed>, the change can be reversed.
+    const embedType = 'iframe'
 
     return generatePDFoMarkup(
       embedType,
@@ -224,21 +217,14 @@ function generatePDFoMarkup (
   // Ensure target element is empty first
   emptyNodeContents(targetNode)
 
-  let embed: HTMLEmbedElement | HTMLIFrameElement
-
-  if (embedType === 'iframe' || embedType === 'fallback') {
-    embed = document.createElement('iframe') as HTMLIFrameElement
-    embed.allow = 'fullscreen'
-  } else {
-    embed = document.createElement('embed') as HTMLEmbedElement
-    embed.type = 'application/pdf'
-  }
+  const embed = document.createElement('iframe')
+  embed.allow = 'fullscreen'
 
   embed.src = embedType === 'fallback' ? url : url + pdfOpenFragment
   embed.className = 'pdfo'
 
   if (!omitInlineStyles) {
-    let style = embedType === 'embed' ? 'overflow: auto;' : 'border: none;'
+    let style = 'border: none;'
 
     if (targetSelector === document.body) {
       style +=
