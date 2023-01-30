@@ -1,7 +1,6 @@
 import * as pdfo from './pdfo'
 
 const pdfOptions = {
-  forceIframe: true,
   pdfOpenParams: {
     view: 'Fit'
   }
