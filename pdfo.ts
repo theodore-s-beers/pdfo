@@ -15,17 +15,13 @@
 //
 
 interface EmbedOptions {
-  assumptionMode?: boolean
-  fallbackLink?: string | boolean
+  assumeSupport?: boolean
+  fallbackLink?: string
   fallbackPrefix?: string
   forceIframe?: boolean
   height?: string
-  id?: string
   omitInlineStyles?: boolean
-  page?: number | string
   pdfOpenParams?: Record<string, unknown>
-  supportRedirect?: boolean
-  title?: string
   width?: string
 }
 
@@ -74,29 +70,21 @@ export function embed (
   const opt = options || {}
 
   // Get passed options, or set reasonable defaults
-  const id = typeof opt.id === 'string' ? opt.id : ''
-  const page = opt.page || null
   const pdfOpenParams = opt.pdfOpenParams || {}
   const width = opt.width || '100%'
   const height = opt.height || '100%'
-  const title = opt.title || 'Embedded PDF'
-  const assumptionMode =
-    typeof opt.assumptionMode === 'boolean' ? opt.assumptionMode : true
-  const supportRedirect =
-    typeof opt.supportRedirect === 'boolean' ? opt.supportRedirect : false
+  const assumeSupport =
+    typeof opt.assumeSupport === 'boolean' ? opt.assumeSupport : true
   const omitInlineStyles =
     typeof opt.omitInlineStyles === 'boolean' ? opt.omitInlineStyles : false
   const forceIframe =
     typeof opt.forceIframe === 'boolean' ? opt.forceIframe : false
 
   // Fallback options require special handling
-  const fallbackPrefix = opt.fallbackPrefix || ''
-  const fallbackLink = fallbackPrefix
-    ? false
-    : typeof opt.fallbackLink === 'string' ||
-      typeof opt.fallbackLink === 'boolean'
+  const fallbackLink = opt.fallbackLink
     ? opt.fallbackLink
-    : true
+    : "<p>This browser does not support inline PDFs. Please download the file to view it: <a href='[url]'>Download PDF</a></p>"
+  const fallbackPrefix = opt.fallbackPrefix || ''
 
   const targetNode = getTargetElement(targetSelector)
 
@@ -104,11 +92,6 @@ export function embed (
   // How would targetNode be falsy? I don't yet understand this
   if (!targetNode) {
     return embedError('Target element cannot be determined')
-  }
-
-  // page option overrides pdfOpenParams, if found
-  if (page) {
-    pdfOpenParams.page = page
   }
 
   // Stringify optional Adobe params for opening PDF (as fragment identifier)
@@ -119,15 +102,14 @@ export function embed (
   // Embed PDF if traditional support is provided, or if this developer is
   // willing to roll with assumption that modern desktop (not mobile) browsers
   // natively support PDFs
-  if (supportsPDFs() || (assumptionMode && !isMobileDevice)) {
+  if (supportsPDFs() || (assumeSupport && !isMobileDevice)) {
     // Should we use <embed> or <iframe>? In most cases <embed>.
     // Allow developer to force <iframe>, if desired
     // There is an edge case where Safari does not respect 302 redirect requests
     // for PDF files when using <embed> element. Redirect appears to work fine
     // when using <iframe> instead of <embed> (Addresses issue #210). Forcing
     // Safari desktop to use iframe due to freezing bug in macOS 11 (Big Sur)
-    const embedType =
-      forceIframe || supportRedirect || isSafariDesktop ? 'iframe' : 'embed'
+    const embedType = forceIframe || isSafariDesktop ? 'iframe' : 'embed'
 
     return generatePDFoMarkup(
       embedType,
@@ -137,8 +119,6 @@ export function embed (
       pdfOpenFragment,
       width,
       height,
-      id,
-      title,
       omitInlineStyles
     )
   }
@@ -156,23 +136,12 @@ export function embed (
       pdfOpenFragment,
       width,
       height,
-      id,
-      title,
       omitInlineStyles
     )
   }
 
-  // Display the fallback link if available
-  if (fallbackLink) {
-    const fallbackHTMLDefault =
-      "<p>This browser does not support inline PDFs. Please download the PDF to view it: <a href='[url]'>Download PDF</a></p>"
-
-    const fallbackHTML =
-      typeof fallbackLink === 'string' ? fallbackLink : fallbackHTMLDefault
-
-    targetNode.innerHTML = fallbackHTML.replace(/\[url\]/g, url)
-  }
-
+  // Otherwise display the fallback link and return an error
+  targetNode.innerHTML = fallbackLink.replace(/\[url\]/, url)
   return embedError('This browser does not support embedded PDFs')
 }
 
@@ -247,8 +216,6 @@ function generatePDFoMarkup (
   pdfOpenFragment: string,
   width: string,
   height: string,
-  id: string,
-  title: string,
   omitInlineStyles: boolean
 ): void {
   // Ensure target element is empty first
@@ -266,17 +233,15 @@ function generatePDFoMarkup (
 
   embed.src = embedType === 'fallback' ? url : url + pdfOpenFragment
   embed.className = 'pdfo'
-  embed.title = title
-  embed.id = id
 
   if (!omitInlineStyles) {
     let style = embedType === 'embed' ? 'overflow: auto;' : 'border: none;'
 
-    if (targetSelector !== document.body) {
-      style += `width: ${width}; height: ${height};`
-    } else {
+    if (targetSelector === document.body) {
       style +=
         'position: absolute; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%;'
+    } else {
+      style += `width: ${width}; height: ${height};`
     }
 
     embed.style.cssText = style
