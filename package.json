@@ -6,6 +6,7 @@
   "author": "Theo Beers",
   "main": "pdfo.ts",
   "scripts": {
+    "all": "dum format && dum lint && dum check && dum compile && dum simple",
     "check": "tsc",
     "compile": "esbuild sample.ts --bundle --minify --sourcemap --outfile=sample.min.js",
     "format": "prettier --write --plugin-search-dir=. .",

@@ -55,7 +55,7 @@ const isMobileDevice =
 
 export function embed (
   url: string,
-  targetSelector: HTMLElement | string,
+  targetSelector?: string,
   options?: EmbedOptions
 ): void {
   // Ensure options not undefined -- enables easier error checking below
@@ -77,7 +77,8 @@ export function embed (
       : "<p>This browser does not support inline PDFs. Please download the file to view it: <a href='[url]'>Download PDF</a></p>"
   const fallbackPrefix = opt.fallbackPrefix || ''
 
-  const targetNode = getTargetElement(targetSelector)
+  const selector = targetSelector || ''
+  const targetNode = getTargetElement(selector)
 
   // If target element is specified but not valid, exit without doing anything
   // How would targetNode be falsy? I don't yet understand this
@@ -108,7 +109,6 @@ export function embed (
     return generatePDFoMarkup(
       embedType,
       targetNode,
-      targetSelector,
       url,
       pdfOpenFragment,
       width,
@@ -125,7 +125,6 @@ export function embed (
     return generatePDFoMarkup(
       embedType,
       targetNode,
-      targetSelector,
       fallbackPrefix + url,
       pdfOpenFragment,
       width,
@@ -138,6 +137,7 @@ export function embed (
   if (fallbackLink) {
     targetNode.innerHTML = fallbackLink.replace(/\[url\]/, url)
   }
+
   return embedError('This browser does not support embedded PDFs')
 }
 
@@ -207,7 +207,6 @@ function emptyNodeContents (node: HTMLElement): void {
 function generatePDFoMarkup (
   embedType: string,
   targetNode: HTMLElement,
-  targetSelector: HTMLElement | string,
   url: string,
   pdfOpenFragment: string,
   width: string,
@@ -226,7 +225,7 @@ function generatePDFoMarkup (
   if (!omitInlineStyles) {
     let style = 'border: none;'
 
-    if (targetSelector === document.body) {
+    if (targetNode === document.body) {
       style +=
         'position: absolute; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%;'
     } else {
@@ -242,22 +241,13 @@ function generatePDFoMarkup (
   targetNode.appendChild(embed)
 }
 
-function getTargetElement (targetSelector: HTMLElement | string): HTMLElement {
-  // Default to body for full-browser PDF
-  let targetNode = document.body
+function getTargetElement (targetSelector: string): HTMLElement {
+  let targetNode: HTMLElement
 
-  // If a targetSelector is specified, check to see whether it's passing a
-  // selector or an HTML element
-
-  if (typeof targetSelector === 'string') {
-    // Is CSS selector
-    targetNode = document.querySelector(targetSelector) as HTMLElement
-  } else if (
-    targetSelector.nodeType !== undefined &&
-    targetSelector.nodeType === 1
-  ) {
-    // Is HTML element
-    targetNode = targetSelector
+  if (targetSelector) {
+    targetNode = document.querySelector(targetSelector) || document.body
+  } else {
+    targetNode = document.body
   }
 
   return targetNode
