@@ -81,9 +81,10 @@ export function embed (
     typeof opt.forceIframe === 'boolean' ? opt.forceIframe : false
 
   // Fallback options require special handling
-  const fallbackLink = opt.fallbackLink
-    ? opt.fallbackLink
-    : "<p>This browser does not support inline PDFs. Please download the file to view it: <a href='[url]'>Download PDF</a></p>"
+  const fallbackLink =
+    typeof opt.fallbackLink === 'string'
+      ? opt.fallbackLink
+      : "<p>This browser does not support inline PDFs. Please download the file to view it: <a href='[url]'>Download PDF</a></p>"
   const fallbackPrefix = opt.fallbackPrefix || ''
 
   const targetNode = getTargetElement(targetSelector)
@@ -140,8 +141,10 @@ export function embed (
     )
   }
 
-  // Otherwise display the fallback link and return an error
-  targetNode.innerHTML = fallbackLink.replace(/\[url\]/, url)
+  // Last resort: display fallback link (if available) and return an error
+  if (fallbackLink) {
+    targetNode.innerHTML = fallbackLink.replace(/\[url\]/, url)
+  }
   return embedError('This browser does not support embedded PDFs')
 }
 
