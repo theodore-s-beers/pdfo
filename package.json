@@ -8,10 +8,10 @@
   "scripts": {
     "all": "dum format && dum lint && dum check && dum compile && dum simple",
     "check": "tsc",
-    "compile": "esbuild sample.ts --bundle --minify --sourcemap --outfile=sample.min.js",
+    "compile": "esbuild sample.ts --bundle --legal-comments=none --minify --sourcemap --outfile=sample.min.js",
     "format": "prettier --write --plugin-search-dir=. .",
     "lint": "eslint --ignore-path .prettierignore --fix .",
-    "simple": "esbuild pdfo.ts --legal-comments=none --minify --outfile=pdfo.min.js",
+    "simple": "esbuild pdfo.ts --legal-comments=none --minify --sourcemap --outfile=pdfo.min.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {

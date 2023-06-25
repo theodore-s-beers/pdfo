@@ -37,8 +37,7 @@ const newMobileTest = nav.userAgentData?.mobile
 
 // Safari on iPadOS doesn't report as "mobile" when requesting a desktop site,
 // yet still fails to embed PDFs.
-const isSafariIPadOS =
-  /Macintosh/i.test(ua) && nav.maxTouchPoints && nav.maxTouchPoints > 1
+const isSafariIPadOS = /Macintosh/i.test(ua) && nav.maxTouchPoints > 1
 
 // Our best guess as to whether we're dealing with a mobile device
 const isMobileDevice =
@@ -69,7 +68,7 @@ export function embed (
   const fallbackLink =
     typeof opt.fallbackLink === 'string'
       ? opt.fallbackLink
-      : "<p>This browser does not support inline PDFs. Please download the file to view it: <a href='[url]'>Download PDF</a></p>"
+      : "<p>This browser does not support embedded PDFs. Please download the file to view it: <a href='[url]'>Download PDF</a></p>"
   const fallbackPrefix = opt.fallbackPrefix || ''
 
   const selector = targetSelector || ''
@@ -160,27 +159,27 @@ export function supportsPDFs (): boolean {
 //
 
 function buildURLFragmentString (pdfParams: Record<string, unknown>): string {
-  let string = ''
+  let str = ''
 
   if (pdfParams) {
     for (const prop in pdfParams) {
       if (Object.prototype.hasOwnProperty.call(pdfParams, prop)) {
-        string += `${encodeURIComponent(prop)}=${encodeURIComponent(
+        str += `${encodeURIComponent(prop)}=${encodeURIComponent(
           String(pdfParams[prop])
         )}&`
       }
     }
 
-    // The string will be empty if no PDF Params found
-    if (string) {
-      string = `#${string}`
+    // String will be empty if no PDF Params found
+    if (str) {
+      str = `#${str}`
 
-      // Remove last ampersand
-      string = string.slice(0, string.length - 1)
+      // Remove final ampersand
+      str = str.slice(0, str.length - 1)
     }
   }
 
-  return string
+  return str
 }
 
 function embedError (msg: string): void {
@@ -202,7 +201,7 @@ function generatePDFoMarkup (
   height: string,
   omitInlineStyles: boolean
 ): void {
-  // Ensure target element is empty first
+  // Ensure target element is empty
   emptyNodeContents(targetNode)
 
   const embed = document.createElement('iframe')
@@ -212,16 +211,16 @@ function generatePDFoMarkup (
   embed.className = 'pdfo'
 
   if (!omitInlineStyles) {
-    let style = 'border: none;'
+    let styles = 'border: none;'
 
     if (targetNode === document.body) {
-      style +=
+      styles +=
         'position: absolute; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%;'
     } else {
-      style += `width: ${width}; height: ${height};`
+      styles += `width: ${width}; height: ${height};`
     }
 
-    embed.style.cssText = style
+    embed.style.cssText = styles
   }
 
   targetNode.classList.add('pdfo-container')
