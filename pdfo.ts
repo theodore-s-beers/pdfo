@@ -30,24 +30,21 @@ interface EmbedOptions {
 
 // Shorthand variables for Navigator object and UA string
 const nav = window.navigator
-const ua = window.navigator.userAgent
+const ua = nav.userAgent
 
 // A recent, and still Chromium-only, way of checking for a mobile browser
 const newMobileTest = nav.userAgentData?.mobile
 
 // Safari on iPadOS doesn't report as "mobile" when requesting a desktop site,
 // yet still fails to embed PDFs.
-const isSafariIOSDesktopMode =
-  nav.platform !== undefined &&
-  nav.platform === 'MacIntel' &&
-  nav.maxTouchPoints !== undefined &&
-  nav.maxTouchPoints > 1
+const isSafariIPadOS =
+  /Macintosh/i.test(ua) && nav.maxTouchPoints && nav.maxTouchPoints > 1
 
 // Our best guess as to whether we're dealing with a mobile device
 const isMobileDevice =
   newMobileTest === true ||
   /Mobi|Tablet|Android|iPad|iPhone/.test(ua) ||
-  isSafariIOSDesktopMode
+  isSafariIPadOS
 
 //
 // PUBLIC FUNCTIONS
@@ -142,12 +139,10 @@ export function embed (
 }
 
 export function supportsPDFs (): boolean {
-  // New property available in recent versions of Chrome and Firefox
-  const pdfViewerEnabled = nav.pdfViewerEnabled
-
-  // If this comes back true or false, best to just go with it?
-  if (typeof pdfViewerEnabled === 'boolean') {
-    return pdfViewerEnabled
+  // New property available in recent versions of Chrome and Firefox. If it
+  // comes back true or false, go with it
+  if (typeof nav.pdfViewerEnabled === 'boolean') {
+    return nav.pdfViewerEnabled
   }
 
   /*
@@ -155,15 +150,11 @@ export function supportsPDFs (): boolean {
     native PDF support in desktop browsers.
     We assume that if the browser supports promises it supports embedded PDFs.
     Is this fragile? Sort of. But browser vendors removed mimetype detection, 
-    so we're left to improvise
+    so we're left to improvise.
   */
   const isModernBrowser = typeof Promise !== 'undefined'
 
-  // We're moving into the age of MIME-less browsers.
-  // They mostly all support PDF rendering without plugins.
-  const likelySupportsPDFs = !isMobileDevice && isModernBrowser
-
-  return likelySupportsPDFs
+  return isModernBrowser && !isMobileDevice
 }
 
 //
