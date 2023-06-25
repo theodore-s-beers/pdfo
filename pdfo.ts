@@ -62,10 +62,8 @@ export function embed (
   const pdfOpenParams = opt.pdfOpenParams || {}
   const width = opt.width || '100%'
   const height = opt.height || '100%'
-  const assumeSupport =
-    typeof opt.assumeSupport === 'boolean' ? opt.assumeSupport : true
-  const omitInlineStyles =
-    typeof opt.omitInlineStyles === 'boolean' ? opt.omitInlineStyles : false
+  const assumeSupport = opt.assumeSupport !== false // true unless explicitly false
+  const omitInlineStyles = opt.omitInlineStyles === true // false unless explicitly true
 
   // Fallback options require special handling
   const fallbackLink =
