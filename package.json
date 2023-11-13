@@ -9,7 +9,7 @@
     "all": "dum format && dum lint && dum check && dum compile && dum simple",
     "check": "tsc",
     "compile": "esbuild sample.ts --bundle --legal-comments=none --minify --sourcemap --outfile=sample.min.js",
-    "format": "prettier --write --plugin-search-dir=. .",
+    "format": "prettier --write .",
     "lint": "eslint --ignore-path .prettierignore --fix .",
     "simple": "esbuild pdfo.ts --legal-comments=none --minify --sourcemap --outfile=pdfo.min.js",
     "test": "echo \"Error: no test specified\" && exit 1"
