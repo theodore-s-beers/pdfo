@@ -136,22 +136,30 @@ export function embed (
 }
 
 export function supportsPDFs (): boolean {
-  // New property available in recent versions of Chrome and Firefox. If it
-  // comes back true or false, go with it
+  // For now it seems safest to return false for any mobile device, since they
+  // sometimes claim to support PDFs but don't do so properly.
+  if (isMobileDevice) {
+    return false
+  }
+
+  // This property is supposed to provide a simple answer to the question of
+  // whether inline PDFs are supported. Unfortunately, I have found that Safari
+  // on iOS returns true, but the PDF embedding is janky (it displays only the
+  // first page). So we'll return this value if it's available, but only after
+  // ruling out mobile devices.
   if (typeof nav.pdfViewerEnabled === 'boolean') {
     return nav.pdfViewerEnabled
   }
 
-  /*
-    There is a coincidental correlation between implementation of promises and 
-    native PDF support in desktop browsers.
-    We assume that if the browser supports promises it supports embedded PDFs.
-    Is this fragile? Sort of. But browser vendors removed mimetype detection, 
-    so we're left to improvise.
-  */
+  // At this point, we would be dealing with a non-mobile browser that doesn't
+  // support the pdfViewerEnabled property. The best that we can do is to check
+  // that the browser is relatively modern, and if so, to return true.
+
+  // There is a coincidental correlation between implementation of promises and
+  // native PDF support in desktop browsers.
   const isModernBrowser = typeof Promise !== 'undefined'
 
-  return isModernBrowser && !isMobileDevice
+  return isModernBrowser
 }
 
 //
