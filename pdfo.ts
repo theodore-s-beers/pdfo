@@ -214,7 +214,6 @@ function generatePDFoMarkup (
 
   const embed = document.createElement('iframe')
   embed.allow = 'fullscreen'
-  embed.setAttribute('sandbox', '')
 
   embed.src = embedType === 'fallback' ? url : url + pdfOpenFragment
   embed.className = 'pdfo'
