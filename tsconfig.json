@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
+    "lib": ["dom", "es6"],
     "noEmit": true,
     "strict": true,
-    "target": "es6",
     "types": ["./node_modules/user-agent-data-types"]
   },
   "files": ["pdfo.ts", "sample.ts"]

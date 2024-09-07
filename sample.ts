@@ -1,9 +1,9 @@
-import * as pdfo from './pdfo'
+import * as pdfo from "./pdfo";
 
 const pdfOptions = {
   pdfOpenParams: {
-    view: 'Fit'
-  }
-}
+    view: "Fit",
+  },
+};
 
-pdfo.embed('dummy.pdf', '#pdf-box', pdfOptions)
+pdfo.embed("dummy.pdf", "#pdf-box", pdfOptions);
