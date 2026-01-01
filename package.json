@@ -22,7 +22,7 @@
     "esbuild": "^0.27.0",
     "eslint": "^9.39.1",
     "knip": "^5.71.0",
-    "prettier": "^3.7.3",
+    "prettier": "^3.7.4",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.48.0",
     "user-agent-data-types": "^0.4.2"
