@@ -41,19 +41,13 @@ const isSafariIPadOS = /Macintosh/i.test(ua) && nav.maxTouchPoints > 1;
 
 // Our best guess as to whether we're dealing with a mobile device
 const isMobileDevice =
-  newMobileTest === true ||
-  /Mobi|Tablet|Android|iPad|iPhone/.test(ua) ||
-  isSafariIPadOS;
+  newMobileTest === true || /Mobi|Tablet|Android|iPad|iPhone/.test(ua) || isSafariIPadOS;
 
 //
 // PUBLIC FUNCTIONS
 //
 
-export function embed(
-  url: string,
-  targetSelector?: string,
-  options?: EmbedOptions,
-): void {
+export function embed(url: string, targetSelector?: string, options?: EmbedOptions): void {
   // Ensure options not undefined -- enables easier error checking below
   const opt = options || {};
 
@@ -172,9 +166,7 @@ function buildURLFragmentString(pdfParams: Record<string, unknown>): string {
   if (pdfParams) {
     for (const prop in pdfParams) {
       if (Object.prototype.hasOwnProperty.call(pdfParams, prop)) {
-        str += `${encodeURIComponent(prop)}=${encodeURIComponent(
-          String(pdfParams[prop]),
-        )}&`;
+        str += `${encodeURIComponent(prop)}=${encodeURIComponent(String(pdfParams[prop]))}&`;
       }
     }
 
