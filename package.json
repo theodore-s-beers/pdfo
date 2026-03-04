@@ -17,14 +17,14 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.2",
-    "@types/node": "^25.2.0",
-    "esbuild": "^0.27.2",
-    "eslint": "^9.39.2",
-    "knip": "^5.83.0",
-    "oxfmt": "^0.28.0",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^25.3.3",
+    "esbuild": "^0.27.3",
+    "eslint": "^10.0.2",
+    "knip": "^5.85.0",
+    "oxfmt": "^0.36.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.54.0",
+    "typescript-eslint": "^8.56.1",
     "user-agent-data-types": "^0.4.2"
   },
   "pnpm": {
