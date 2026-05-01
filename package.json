@@ -25,7 +25,7 @@
     "oxfmt": "^0.36.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.56.1",
-    "user-agent-data-types": "^0.4.2"
+    "user-agent-data-types": "^0.4.3"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
