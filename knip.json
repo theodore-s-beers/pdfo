@@ -1,8 +1,5 @@
 {
-  "$schema": "https://unpkg.com/knip@5/schema.json",
-  "ignoreExportsUsedInFile": {
-    "interface": true,
-    "type": true
-  },
-  "tags": ["-lintignore"]
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "tags": ["-lintignore"],
+  "ignoreFiles": ["*.min.js"]
 }
