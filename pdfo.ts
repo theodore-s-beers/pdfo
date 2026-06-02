@@ -14,7 +14,7 @@
 // TYPES
 //
 
-interface EmbedOptions {
+export interface EmbedOptions {
   assumeSupport?: boolean;
   fallbackLink?: string;
   fallbackPrefix?: string;
