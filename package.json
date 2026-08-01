@@ -21,7 +21,7 @@
     "@typescript/native-preview": "7.0.0-dev.20260630.1",
     "esbuild": "^0.28.1",
     "knip": "^6.23.0",
-    "oxfmt": "^0.57.0",
+    "oxfmt": "^0.60.0",
     "oxlint": "^1.72.0",
     "typescript": "^6.0.3",
     "user-agent-data-types": "^0.4.3"
