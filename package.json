@@ -22,7 +22,7 @@
     "esbuild": "^0.28.1",
     "knip": "^6.31.0",
     "oxfmt": "^0.61.0",
-    "oxlint": "^1.76.0",
+    "oxlint": "^1.80.0",
     "typescript": "^7.0.2",
     "user-agent-data-types": "^0.4.3"
   }
