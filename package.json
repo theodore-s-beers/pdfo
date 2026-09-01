@@ -17,12 +17,12 @@
     "test": "echo 'Error: no test specified' && exit 1"
   },
   "devDependencies": {
-    "@types/node": "^26.1.2",
+    "@types/node": "^26.4.0",
     "@typescript/native-preview": "7.0.0-dev.20260707.2",
-    "esbuild": "^0.28.1",
-    "knip": "^6.31.0",
-    "oxfmt": "^0.61.0",
-    "oxlint": "^1.76.0",
+    "esbuild": "^0.28.2",
+    "knip": "^6.33.0",
+    "oxfmt": "^0.65.0",
+    "oxlint": "^1.80.0",
     "typescript": "^7.0.2",
     "user-agent-data-types": "^0.4.3"
   }
