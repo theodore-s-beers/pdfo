@@ -17,7 +17,7 @@
     "test": "echo 'Error: no test specified' && exit 1"
   },
   "devDependencies": {
-    "@types/node": "^26.1.2",
+    "@types/node": "^26.3.0",
     "@typescript/native-preview": "7.0.0-dev.20260707.2",
     "esbuild": "^0.28.1",
     "knip": "^6.31.0",
